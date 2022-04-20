@@ -12,7 +12,8 @@
 'use strict';
 
 const AsyncStorage = require('react-native').AsyncStorage;
-const Linking = require('react-native').Linking;
+const 
+= require('react-native').Linking;
 const NavigationPropTypes = require('./NavigationPropTypes');
 const NavigationStateUtils = require('./NavigationStateUtils');
 const Platform = require('react-native').Platform;
@@ -118,7 +119,9 @@ class NavigationRootContainer extends React.Component<any, Props, State> {
   componentDidMount(): void {
     if (this.props.linkingActionMap) {
       Linking.getInitialURL().then(this._handleOpenURL.bind(this));
-      Platform.OS === 'ios' && Linking.addEventListener('url', this._handleOpenURLEvent);
+      if (Platform.OS === 'ios') {
+        this.linking = Linking.addEventListener('url', this._handleOpenURLEvent);
+      }
     }
     if (this.props.persistenceKey) {
       AsyncStorage.getItem(this.props.persistenceKey, (err, storedString) => {
@@ -137,8 +140,8 @@ class NavigationRootContainer extends React.Component<any, Props, State> {
   }
 
   componentWillUnmount(): void {
-    if (Platform.OS === 'ios') {
-      Linking.removeEventListener('url', this._handleOpenURLEvent);
+    if (Platform.OS === 'ios' && this.linking) {
+     this.linking.remove();
     }
   }
 
